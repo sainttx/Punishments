@@ -230,7 +230,7 @@ public class CommandHandler implements CommandExecutor {
                                         Util.formatTimestamp(punishment.getCreated()) +
                                         ": " +
                                         ChatColor.WHITE +
-                                        punishment.getMessage());
+                                        punishment.getMessage()
                         );
                     }
                 } else {
