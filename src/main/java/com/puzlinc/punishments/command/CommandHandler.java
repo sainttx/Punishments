@@ -40,16 +40,16 @@ public class CommandHandler implements CommandExecutor {
 
     public boolean onCommand(CommandSender cs, Command cmd, String alias, String[] args) {
         String label = cmd.getLabel();
-        UUID admin = (cs instanceof Player) ? ((Player)cs).getUniqueId() : null;
+        UUID admin = (cs instanceof Player) ? ((Player) cs).getUniqueId() : null;
 
-        if(label.equalsIgnoreCase("kick")) {
+        if (label.equalsIgnoreCase("kick")) {
             if (cs.hasPermission("punishments.kick")) {
-                if (args.length > 0) {
+                if (args.length >= 1) {
                     String name = args[0];
                     Player player = Bukkit.getPlayer(name);
 
                     if (player == null) {
-                        cs.sendMessage("Cannot find player: " + name);
+                        cs.sendMessage(ChatColor.RED + "Cannot find player: " + name);
                         return true;
                     }
 
@@ -57,11 +57,11 @@ public class CommandHandler implements CommandExecutor {
                     if (args.length >= 2) {
                         reason = Util.argsToString(args, 1, args.length);
                     }
-
                     PunishmentManager.Punishment punishment = manager.addPunishment(
                             PunishmentManager.PunishmentType.KICK,
                             player.getUniqueId(),
                             admin,
+                            cs.getName(),
                             System.currentTimeMillis(),
                             manager.PUNISHMENT_EXPIRED,
                             manager.getServer(),
@@ -69,40 +69,39 @@ public class CommandHandler implements CommandExecutor {
                     );
 
                     player.kickPlayer(punishment.getMessage());
-                    cs.sendMessage("Player: " + player.getName() + " kicked.");
+                    Bukkit.broadcastMessage(ChatColor.RED + "Player " + player.getName() + " was kicked by " + cs.getName());
                 } else {
-                    cs.sendMessage("Usage: /kick <player> [reason]");
+                    cs.sendMessage(ChatColor.RED + "Usage: /kick <player> [reason ...]");
                 }
             } else {
-                cs.sendMessage("Insufficient permissions.");
+                cs.sendMessage(ChatColor.RED + "Insufficient permissions.");
             }
-        } else if(label.equalsIgnoreCase("ban")) {
+        } else if (label.equalsIgnoreCase("ban")) {
             if (cs.hasPermission("punishments.ban")) {
-                if (args.length > 0) {
+                if (args.length >= 2) {
                     String name = args[0];
                     OfflinePlayer player = Bukkit.getOfflinePlayer(name);
 
                     if (player == null) {
-                        cs.sendMessage("Cannot find player: " + name);
+                        cs.sendMessage(ChatColor.RED + "Cannot find player: " + name);
                         return true;
                     }
 
                     String reason = null;
                     long length = manager.PUNISHMENT_EXPIRE_NEVER;
-                    if (args.length >= 2) {
-                        long givenTime = Util.lengthToMiliseconds(args[1]);
-                        if (givenTime != 0) {
-                            length = System.currentTimeMillis() + givenTime;
-                            reason = Util.argsToString(args, 2, args.length);
-                        } else {
-                            reason = Util.argsToString(args, 1, args.length);
-                        }
+                    long givenTime = Util.lengthToMiliseconds(args[1]);
+                    if (givenTime != 0) {
+                        length = System.currentTimeMillis() + givenTime;
+                    }
+                    if (args.length >= 3) {
+                        reason = Util.argsToString(args, 2, args.length);
                     }
 
                     PunishmentManager.Punishment punishment = manager.addPunishment(
                             PunishmentManager.PunishmentType.BAN,
                             player.getUniqueId(),
                             admin,
+                            cs.getName(),
                             System.currentTimeMillis(),
                             length,
                             manager.getServer(),
@@ -110,43 +109,42 @@ public class CommandHandler implements CommandExecutor {
                     );
 
                     if (player.isOnline()) {
-                        ((Player)player).kickPlayer(punishment.getMessage());
+                        ((Player) player).kickPlayer(punishment.getMessage());
                     }
 
-                    cs.sendMessage("Player: " + player.getName() + " banned.");
+                    Bukkit.broadcastMessage(ChatColor.RED + "Player " + player.getName() + " was banned by " + cs.getName());
                 } else {
-                    cs.sendMessage("Usage: /ban <player> [length] [reason]");
+                    cs.sendMessage(ChatColor.RED + "Usage: /ban <player> <length> [reason ...]");
                 }
             } else {
-                cs.sendMessage("Insufficient permissions.");
+                cs.sendMessage(ChatColor.RED + "Insufficient permissions.");
             }
-        } else if(label.equalsIgnoreCase("mute")) {
+        } else if (label.equalsIgnoreCase("mute")) {
             if (cs.hasPermission("punishments.mute")) {
-                if (args.length > 0) {
+                if (args.length >= 2) {
                     String name = args[0];
                     OfflinePlayer player = Bukkit.getOfflinePlayer(name);
 
                     if (player == null) {
-                        cs.sendMessage("Cannot find player: " + name);
+                        cs.sendMessage(ChatColor.RED + "Cannot find player: " + name);
                         return true;
                     }
 
                     String reason = null;
                     long length = manager.PUNISHMENT_EXPIRE_NEVER;
-                    if (args.length >= 2) {
-                        long givenTime = Util.lengthToMiliseconds(args[1]);
-                        if (givenTime != 0) {
-                            length = System.currentTimeMillis() + givenTime;
-                            reason = Util.argsToString(args, 2, args.length);
-                        } else {
-                            reason = Util.argsToString(args, 1, args.length);
-                        }
+                    long givenTime = Util.lengthToMiliseconds(args[1]);
+                    if (givenTime != 0) {
+                        length = System.currentTimeMillis() + givenTime;
+                    }
+                    if (args.length >= 3) {
+                        reason = Util.argsToString(args, 2, args.length);
                     }
 
                     PunishmentManager.Punishment punishment = manager.addPunishment(
                             PunishmentManager.PunishmentType.MUTE,
                             player.getUniqueId(),
                             admin,
+                            cs.getName(),
                             System.currentTimeMillis(),
                             length,
                             manager.getServer(),
@@ -154,95 +152,95 @@ public class CommandHandler implements CommandExecutor {
                     );
 
                     if (player.isOnline()) {
-                        ((Player)player).sendMessage(punishment.getMessage());
+                        ((Player) player).sendMessage(punishment.getMessage());
                     }
-                    cs.sendMessage("Player: " + player.getName() + " muted.");
+                    Bukkit.broadcastMessage(ChatColor.RED + "Player " + player.getName() + " was muted by " + cs.getName());
                 } else {
-                    cs.sendMessage("Usage: /mute <player> [length] [reason]");
+                    cs.sendMessage(ChatColor.RED + "Usage: /mute <player> <length> [reason ...]");
                 }
             } else {
-                cs.sendMessage("Insufficient permissions.");
+                cs.sendMessage(ChatColor.RED + "Insufficient permissions.");
             }
-        } else if(label.equalsIgnoreCase("unban")) {
+        } else if (label.equalsIgnoreCase("unban")) {
             if (cs.hasPermission("punishments.unban")) {
                 if (args.length == 1) {
                     String name = args[0];
                     OfflinePlayer player = Bukkit.getOfflinePlayer(name);
 
                     if (player == null) {
-                        cs.sendMessage("Cannot find player: " + name);
+                        cs.sendMessage(ChatColor.RED + "Cannot find player: " + name);
                         return true;
                     }
 
                     PunishmentManager.Punishment punishment;
                     if ((punishment = manager.hasActivePunishment(player.getUniqueId(), PunishmentManager.PunishmentType.BAN)) != null) {
                         punishment.expire();
-                        cs.sendMessage("Player: " + player.getName() + " unbanned");
+                        Bukkit.broadcastMessage(ChatColor.RED + "Player " + player.getName() + " was unbanned by " + cs.getName());
                     } else {
                         cs.sendMessage("Player: " + player.getName() + " not banned");
                     }
                 } else {
-                    cs.sendMessage("Usage: /unban <player>");
+                    cs.sendMessage(ChatColor.RED + "Usage: /unban <player>");
                 }
             } else {
-                cs.sendMessage("Insufficient permissions.");
+                cs.sendMessage(ChatColor.RED + "Insufficient permissions.");
             }
-        } else if(label.equalsIgnoreCase("unmute")) {
+        } else if (label.equalsIgnoreCase("unmute")) {
             if (cs.hasPermission("punishments.unmute")) {
                 if (args.length == 1) {
                     String name = args[0];
                     OfflinePlayer player = Bukkit.getOfflinePlayer(name);
 
                     if (player == null) {
-                        cs.sendMessage("Cannot find player: " + name);
+                        cs.sendMessage(ChatColor.RED + "Cannot find player: " + name);
                         return true;
                     }
 
                     PunishmentManager.Punishment punishment;
                     if ((punishment = manager.hasActivePunishment(player.getUniqueId(), PunishmentManager.PunishmentType.MUTE)) != null) {
                         punishment.expire();
-                        cs.sendMessage("Player: " + player.getName() + " unmuted");
+                        Bukkit.broadcastMessage(ChatColor.RED + "Player " + player.getName() + " was unmuted by " + cs.getName());
                     } else {
-                        cs.sendMessage("Player: " + player.getName() + " is not muted");
+                        cs.sendMessage(ChatColor.RED + "Player: " + player.getName() + " is not muted");
                     }
                 } else {
-                    cs.sendMessage("Usage: /unmute <player>");
+                    cs.sendMessage(ChatColor.RED + "Usage: /unmute <player>");
                 }
             } else {
-                cs.sendMessage("Insufficient permissions.");
+                cs.sendMessage(ChatColor.RED + "Insufficient permissions.");
             }
-        } else if(label.equalsIgnoreCase("history")) {
+        } else if (label.equalsIgnoreCase("history")) {
             if (cs.hasPermission("punishments.history")) {
                 if (args.length == 1) {
                     String name = args[0];
                     OfflinePlayer player = Bukkit.getOfflinePlayer(name);
 
                     if (player == null) {
-                        cs.sendMessage("Cannot find player: " + name);
+                        cs.sendMessage(ChatColor.RED + "Cannot find player: " + name);
                         return true;
                     }
 
-                    cs.sendMessage("History for: " + player.getName());
+                    cs.sendMessage(ChatColor.YELLOW + "History for: " + player.getName());
 
                     for (PunishmentManager.Punishment punishment : manager.getAllPunishmentsFor(player.getUniqueId())) {
                         cs.sendMessage(
                                 ChatColor.GOLD +
-                                "(" + punishment.getId() + ") " +
-                                ChatColor.GRAY +
-                                Util.formatTimestamp(punishment.getCreated()) +
-                                ": " +
-                                ChatColor.WHITE +
-                                punishment.getMessage() +
-                                " by " +
-                                ChatColor.GRAY +
-                                (punishment.getAdmin() == null ? "CONSOLE" : Bukkit.getOfflinePlayer(punishment.getAdmin()).getName())
+                                        "(" + punishment.getId() + ") " +
+                                        ChatColor.GRAY +
+                                        Util.formatTimestamp(punishment.getCreated()) +
+                                        ": " +
+                                        ChatColor.WHITE +
+                                        punishment.getMessage() +
+                                        " by " +
+                                        ChatColor.GRAY +
+                                        (punishment.getAdmin() == null ? "CONSOLE" : Bukkit.getOfflinePlayer(punishment.getAdmin()).getName())
                         );
                     }
                 } else {
-                    cs.sendMessage("Usage: /history <player>");
+                    cs.sendMessage(ChatColor.RED + "Usage: /history <player>");
                 }
             } else {
-                cs.sendMessage("Insufficient permissions.");
+                cs.sendMessage(ChatColor.RED + "Insufficient permissions.");
             }
         }
         return true;

@@ -43,6 +43,7 @@ public class PunishmentManager {
 
         private UUID target;
         private UUID admin;
+        private String adminName;
 
         private long created;
         private long expires;
@@ -50,11 +51,12 @@ public class PunishmentManager {
         private String server;
         private String reason;
 
-        public Punishment(int id, PunishmentType type, UUID target, UUID admin, long created, long expires, String server, String reason) {
+        public Punishment(int id, PunishmentType type, UUID target, UUID admin, String adminName, long created, long expires, String server, String reason) {
             this.id = id;
             this.type = type;
             this.target = target;
             this.admin = admin;
+            this.adminName = adminName;
             this.created = created;
             this.expires = expires;
             this.server = server;
@@ -142,6 +144,14 @@ public class PunishmentManager {
         }
 
         /**
+         * Get the name of the player who the punishment was created by.
+         * @return Admin name.
+         */
+        public String getAdminName() {
+            return adminName;
+        }
+
+        /**
          * Get the {@link com.puzlinc.punishments.PunishmentManager.PunishmentType} of this punishment.
          * @return Punishment type.
          */
@@ -165,6 +175,8 @@ public class PunishmentManager {
                 builder.append(" for ");
                 builder.append(getReason());
             }
+            builder.append(" by ");
+            builder.append(getAdminName());
             return builder.toString();
         }
     }
@@ -179,7 +191,7 @@ public class PunishmentManager {
 
         private String verb;
 
-        private PunishmentType(String verb) {
+        PunishmentType(String verb) {
             this.verb = verb;
         }
 
@@ -218,6 +230,7 @@ public class PunishmentManager {
                 "  `type` VARCHAR(45) NOT NULL," +
                 "  `target` VARCHAR(45) NOT NULL," +
                 "  `admin` VARCHAR(45) NULL," +
+                "`adminName` VARCHAR(45) NULL, " +
                 "  `created` BIGINT NULL," +
                 "  `expires` BIGINT NOT NULL," +
                 "  `server` VARCHAR(45) NOT NULL," +
@@ -238,7 +251,7 @@ public class PunishmentManager {
 
             sqlQueryAll = "SELECT * FROM " + table +" WHERE expires <> 0 AND expires > UNIX_TIMESTAMP()";
             sqlQueryTarget = "SELECT * FROM " + table +" WHERE target = ?";
-            sqlInsert = "INSERT INTO " + table + "(`type`, `target`, `admin`, `created`, `expires`, `server`, `reason`) VALUES (?, ?, ?, ?, ?, ?, ?)";
+            sqlInsert = "INSERT INTO " + table + "(`type`, `target`, `admin`, `adminName`, `created`, `expires`, `server`, `reason`) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
             sqlUpdate = "UPDATE " + table + " SET expires = ? WHERE id = ?";
 
             updateBatch = database.getConnection().prepareStatement(sqlInsert);
@@ -366,8 +379,8 @@ public class PunishmentManager {
      * @param reason The reason for the punishment
      * @return A new punishment
      */
-    public Punishment addPunishment(PunishmentType type, UUID target, UUID admin, long created, long expires, String server, String reason) {
-        Punishment punishment = new Punishment(nextId, type, target, admin, created, expires, server, reason);
+    public Punishment addPunishment(PunishmentType type, UUID target, UUID admin, String adminName, long created, long expires, String server, String reason) {
+        Punishment punishment = new Punishment(nextId, type, target, admin, adminName, created, expires, server, reason);
         nextId++;
 
         localAddPunishment(punishment, punishments);
@@ -376,10 +389,11 @@ public class PunishmentManager {
             updateBatch.setString(1, type.toString());
             updateBatch.setString(2, target.toString());
             updateBatch.setString(3, admin != null ? admin.toString() : null);
-            updateBatch.setLong(4, created);
-            updateBatch.setLong(5, expires);
-            updateBatch.setString(6, server);
-            updateBatch.setString(7, reason);
+            updateBatch.setString(4, adminName);
+            updateBatch.setLong(5, created);
+            updateBatch.setLong(6, expires);
+            updateBatch.setString(7, server);
+            updateBatch.setString(8, reason);
 
             updateBatch.addBatch();
             nextId++;
@@ -429,12 +443,13 @@ public class PunishmentManager {
                 PunishmentType type = PunishmentType.valueOf(rs.getString("type"));
                 UUID target = UUID.fromString(rs.getString("target"));
                 UUID admin = rs.getString("admin") != null ? UUID.fromString(rs.getString("admin")) : null;
+                String adminName = rs.getString("adminName");
                 long created = rs.getLong("created");
                 long expires = rs.getLong("expires");
                 String server = rs.getString("server");
                 String reason = rs.getString("reason");
 
-                list.add(new Punishment(id, type, target, admin, created, expires, server, reason));
+                list.add(new Punishment(id, type, target, admin, adminName, created, expires, server, reason));
             }
         } catch (SQLException e) {
             e.printStackTrace();

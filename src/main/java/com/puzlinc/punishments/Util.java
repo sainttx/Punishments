@@ -41,7 +41,7 @@ public class Util {
         int[] lifeInterval = new int[]{ 86400, 3600, 60, 1 };
         long seconds = 0L;
 
-        for (int i=0;i<lifeMatch.length;i++) {
+        for (int i = 0 ; i < lifeMatch.length ; i++) {
             Matcher matcher = Pattern.compile("([0-9]*)" + lifeMatch[i]).matcher(string);
             while (matcher.find()) {
                 seconds += Integer.parseInt(matcher.group(1)) * lifeInterval[i];
@@ -57,11 +57,11 @@ public class Util {
 
     public static String argsToString(String[] args, int start, int end) {
         StringBuilder builder = new StringBuilder();
-        for (int i=start;i<end;i++) {
-            builder.append(args);
+        for (int i = start ; i < end ; i++) {
+            builder.append(args[i]);
             builder.append(" ");
         }
-        builder.deleteCharAt(builder.length()-1);
+        builder.deleteCharAt(builder.length() - 1);
         return builder.toString();
     }
 }
