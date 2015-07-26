@@ -230,10 +230,7 @@ public class CommandHandler implements CommandExecutor {
                                         Util.formatTimestamp(punishment.getCreated()) +
                                         ": " +
                                         ChatColor.WHITE +
-                                        punishment.getMessage() +
-                                        " by " +
-                                        ChatColor.GRAY +
-                                        (punishment.getAdmin() == null ? "CONSOLE" : Bukkit.getOfflinePlayer(punishment.getAdmin()).getName())
+                                        punishment.getMessage());
                         );
                     }
                 } else {
