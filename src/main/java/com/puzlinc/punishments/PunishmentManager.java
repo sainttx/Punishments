@@ -65,6 +65,7 @@ public class PunishmentManager {
 
         /**
          * Get the ID for the punishment
+         *
          * @return Punishment ID
          */
         public int getId() {
@@ -73,6 +74,7 @@ public class PunishmentManager {
 
         /**
          * Get the unix timestamp at which the punishment expires
+         *
          * @return Punishment expiration
          */
         public long getExpires() {
@@ -81,6 +83,7 @@ public class PunishmentManager {
 
         /**
          * Determine whether the punishment is expired or not
+         *
          * @return True if punishment is expired
          */
         public boolean hasExpired() {
@@ -96,6 +99,7 @@ public class PunishmentManager {
 
         /**
          * Set a time at which the punishment will expire
+         *
          * @param time Unix timestamp at which punishment expires
          */
         public void setExpires(long time) {
@@ -105,6 +109,7 @@ public class PunishmentManager {
 
         /**
          * Get the unix timestamp at which the punishment was created.
+         *
          * @return Creation time.
          */
         public long getCreated() {
@@ -113,6 +118,7 @@ public class PunishmentManager {
 
         /**
          * Get the server on which the punishment was created.
+         *
          * @return Creation server.
          */
         public String getServer() {
@@ -121,6 +127,7 @@ public class PunishmentManager {
 
         /**
          * Get the reason given for the punishment.
+         *
          * @return Creation reason, or false if no reason given.
          */
         public String getReason() {
@@ -129,6 +136,7 @@ public class PunishmentManager {
 
         /**
          * Get the UUID of the player who the punishment applies to.
+         *
          * @return Target UUID.
          */
         public UUID getTarget() {
@@ -137,6 +145,7 @@ public class PunishmentManager {
 
         /**
          * Get the UUID of the player who the punishment was created by.
+         *
          * @return Admin UUID.
          */
         public UUID getAdmin() {
@@ -145,6 +154,7 @@ public class PunishmentManager {
 
         /**
          * Get the name of the player who the punishment was created by.
+         *
          * @return Admin name.
          */
         public String getAdminName() {
@@ -153,6 +163,7 @@ public class PunishmentManager {
 
         /**
          * Get the {@link com.puzlinc.punishments.PunishmentManager.PunishmentType} of this punishment.
+         *
          * @return Punishment type.
          */
         public PunishmentType getType() {
@@ -162,6 +173,7 @@ public class PunishmentManager {
         /**
          * Get the message to show the user for this punishment.
          * Follows the format "{@link com.puzlinc.punishments.PunishmentManager.PunishmentType#getVerb()} until TIME for REASON."
+         *
          * @return Punishment message
          */
         public String getMessage() {
@@ -198,6 +210,7 @@ public class PunishmentManager {
         /**
          * Get the verb for usage in sending messages.
          * For instance, BAN -> "Banned".
+         *
          * @return Verb
          */
         public String getVerb() {
@@ -226,16 +239,16 @@ public class PunishmentManager {
 
         String sqlCreate =
                 "CREATE TABLE IF NOT EXISTS `" + table + "` (" +
-                "  `id` INT NOT NULL AUTO_INCREMENT," +
-                "  `type` VARCHAR(45) NOT NULL," +
-                "  `target` VARCHAR(45) NOT NULL," +
-                "  `admin` VARCHAR(45) NULL," +
-                "`adminName` VARCHAR(45) NULL, " +
-                "  `created` BIGINT NULL," +
-                "  `expires` BIGINT NOT NULL," +
-                "  `server` VARCHAR(45) NOT NULL," +
-                "  `reason` VARCHAR(45) NULL," +
-                "  PRIMARY KEY (`id`))";
+                        "  `id` INT NOT NULL AUTO_INCREMENT," +
+                        "  `type` VARCHAR(45) NOT NULL," +
+                        "  `target` VARCHAR(45) NOT NULL," +
+                        "  `admin` VARCHAR(45) NULL," +
+                        "`adminName` VARCHAR(45) NULL, " +
+                        "  `created` BIGINT NULL," +
+                        "  `expires` BIGINT NOT NULL," +
+                        "  `server` VARCHAR(45) NOT NULL," +
+                        "  `reason` VARCHAR(45) NULL," +
+                        "  PRIMARY KEY (`id`))";
 
         String sqlGetNextId = "SELECT MAX(id) AS max FROM " + table;
 
@@ -246,11 +259,11 @@ public class PunishmentManager {
             statement = database.getConnection().prepareStatement(sqlGetNextId);
             ResultSet rs = statement.executeQuery();
             while (rs.next()) {
-                nextId = rs.getInt("max")+1;
+                nextId = rs.getInt("max") + 1;
             }
 
-            sqlQueryAll = "SELECT * FROM " + table +" WHERE expires <> 0 AND expires > UNIX_TIMESTAMP()";
-            sqlQueryTarget = "SELECT * FROM " + table +" WHERE target = ?";
+            sqlQueryAll = "SELECT * FROM " + table + " WHERE expires <> 0 AND expires > UNIX_TIMESTAMP()";
+            sqlQueryTarget = "SELECT * FROM " + table + " WHERE target = ?";
             sqlInsert = "INSERT INTO " + table + "(`type`, `target`, `admin`, `adminName`, `created`, `expires`, `server`, `reason`) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
             sqlUpdate = "UPDATE " + table + " SET expires = ? WHERE id = ?";
 
@@ -275,6 +288,7 @@ public class PunishmentManager {
 
     /**
      * Get this server's name.
+     *
      * @return Server name
      */
     public String getServer() {
@@ -299,6 +313,7 @@ public class PunishmentManager {
 
     /**
      * Loads all active remote punishments and stores them in local memory for a given player
+     *
      * @param id UUID of specified player
      */
     public void loadActivePunishmentsFor(UUID id) {
@@ -315,6 +330,7 @@ public class PunishmentManager {
 
     /**
      * Gets all remote punishments for a given player regardless of whether or not they are active
+     *
      * @param id UUID of specified player
      * @return List of remote punishment history for player
      */
@@ -333,6 +349,7 @@ public class PunishmentManager {
 
     /**
      * Gets all local active punishments for a given player
+     *
      * @param id UUID of specified player
      * @return List of local active punishments
      */
@@ -342,6 +359,7 @@ public class PunishmentManager {
 
     /**
      * Gets all remote and local (unsynced) punishments for a given player regardless of whether or not they are active
+     *
      * @param id UUID of specified player
      * @return List of total punishment history for player
      */
@@ -355,7 +373,8 @@ public class PunishmentManager {
 
     /**
      * Determines whether a player currently has an active punishment of a specified type
-     * @param id UUID of specified player
+     *
+     * @param id   UUID of specified player
      * @param type PunishmentType to check for
      * @return Punishment value, if active or null if none found
      */
@@ -370,13 +389,14 @@ public class PunishmentManager {
 
     /**
      * Adds a new punishment to the local history, pending sync to database
-     * @param type PunishmentType
-     * @param target Target player's UUID
-     * @param admin Admin player's UUID
+     *
+     * @param type    PunishmentType
+     * @param target  Target player's UUID
+     * @param admin   Admin player's UUID
      * @param created The timestamp the punishment was created
      * @param expires The timestamp the punishment will expire
-     * @param server The server the punishment was created on
-     * @param reason The reason for the punishment
+     * @param server  The server the punishment was created on
+     * @param reason  The reason for the punishment
      * @return A new punishment
      */
     public Punishment addPunishment(PunishmentType type, UUID target, UUID admin, String adminName, long created, long expires, String server, String reason) {
@@ -405,8 +425,9 @@ public class PunishmentManager {
 
     /**
      * Add a punishment only to the local set of punishments
+     *
      * @param punishment Punishment to add
-     * @param map Map to use (either pending sync or already synced)
+     * @param map        Map to use (either pending sync or already synced)
      */
     private void localAddPunishment(Punishment punishment, Map<UUID, List<Punishment>> map) {
         if (map.containsKey(punishment.getTarget())) {
@@ -420,8 +441,9 @@ public class PunishmentManager {
 
     /**
      * Update a punishment expire status
+     *
      * @param punishment Punishment to update
-     * @param expires New expire time
+     * @param expires    New expire time
      */
     public void updatePunishment(Punishment punishment, long expires) {
         try {
