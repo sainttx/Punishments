@@ -100,11 +100,11 @@ public class CommandHandler implements CommandExecutor {
 
                     if (length == manager.PUNISHMENT_EXPIRE_NEVER
                             && !cs.hasPermission("punishments.ban.permanent")) {
-                        cs.sendMessage(ChatColor.RED + "You don't have permission to temporarily ban players");
+                        cs.sendMessage(ChatColor.RED + "You can't ban players for that long");
                         return true;
                     } else if (givenTime > TimeUnit.MILLISECONDS.convert(7, TimeUnit.DAYS)
                             && !cs.hasPermission("punishments.ban.bypass.templimit")) {
-                        cs.sendMessage(ChatColor.RED + "You can't temp ban players for that long");
+                        cs.sendMessage(ChatColor.RED + "You can't ban players for that long");
                         return true;
                     }
 
@@ -155,6 +155,18 @@ public class CommandHandler implements CommandExecutor {
                         reason = Util.argsToString(args, 2, args.length);
                     }
 
+
+                    if (length == manager.PUNISHMENT_EXPIRE_NEVER
+                            && !cs.hasPermission("punishments.ban.permanent")) {
+                        cs.sendMessage(ChatColor.RED + "You can't mute players for that long");
+                        return true;
+                    } else if (givenTime > TimeUnit.MILLISECONDS.convert(3, TimeUnit.HOURS)
+                            && !cs.hasPermission("punishments.ban.bypass.templimit")) {
+                        cs.sendMessage(ChatColor.RED + "You can't mute players for that long");
+                        return true;
+                    }
+
+
                     PunishmentManager.Punishment punishment = manager.addPunishment(
                             PunishmentManager.PunishmentType.MUTE,
                             player.getUniqueId(),
@@ -169,7 +181,11 @@ public class CommandHandler implements CommandExecutor {
                     if (player.isOnline()) {
                         ((Player) player).sendMessage(punishment.getMessage());
                     }
-                    Bukkit.broadcastMessage(ChatColor.RED + "Player " + player.getName() + " was muted by " + cs.getName());
+                    if (length == manager.PUNISHMENT_EXPIRE_NEVER) {
+                        Bukkit.broadcastMessage(ChatColor.RED + "Player " + player.getName() + " was muted by " + cs.getName());
+                    } else {
+                        Bukkit.broadcastMessage(ChatColor.RED + "Player " + player.getName() + " was temporarily muted by " + cs.getName());
+                    }
                 } else {
                     cs.sendMessage(ChatColor.RED + "Usage: /mute <player> <length> [reason ...]");
                 }
