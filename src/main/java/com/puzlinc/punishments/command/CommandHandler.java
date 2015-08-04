@@ -29,6 +29,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 public class CommandHandler implements CommandExecutor {
 
@@ -97,6 +98,16 @@ public class CommandHandler implements CommandExecutor {
                         reason = Util.argsToString(args, 2, args.length);
                     }
 
+                    if (length == manager.PUNISHMENT_EXPIRE_NEVER
+                            && !cs.hasPermission("punishments.ban.permanent")) {
+                        cs.sendMessage(ChatColor.RED + "You don't have permission to temporarily ban players");
+                        return true;
+                    } else if (givenTime > TimeUnit.MILLISECONDS.convert(7, TimeUnit.DAYS)
+                            && !cs.hasPermission("punishments.ban.bypass.templimit")) {
+                        cs.sendMessage(ChatColor.RED + "You can't temp ban players for that long");
+                        return true;
+                    }
+
                     PunishmentManager.Punishment punishment = manager.addPunishment(
                             PunishmentManager.PunishmentType.BAN,
                             player.getUniqueId(),
@@ -112,7 +123,11 @@ public class CommandHandler implements CommandExecutor {
                         ((Player) player).kickPlayer(punishment.getMessage());
                     }
 
-                    Bukkit.broadcastMessage(ChatColor.RED + "Player " + player.getName() + " was banned by " + cs.getName());
+                    if (length == manager.PUNISHMENT_EXPIRE_NEVER) {
+                        Bukkit.broadcastMessage(ChatColor.RED + "Player " + player.getName() + " was banned by " + cs.getName());
+                    } else {
+                        Bukkit.broadcastMessage(ChatColor.RED + "Player " + player.getName() + " was temporarily banned by " + cs.getName());
+                    }
                 } else {
                     cs.sendMessage(ChatColor.RED + "Usage: /ban <player> <length> [reason ...]");
                 }
