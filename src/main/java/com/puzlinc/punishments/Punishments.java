@@ -41,7 +41,7 @@ public class Punishments extends JavaPlugin {
         getCommand("mute").setExecutor(handler);
         getCommand("unban").setExecutor(handler);
         getCommand("unmute").setExecutor(handler);
-        getCommand("history").setExecutor(handler);
+        getCommand("lookup").setExecutor(handler);
 
         getServer().getPluginManager().registerEvents(new PlayerListener(manager), this);
     }

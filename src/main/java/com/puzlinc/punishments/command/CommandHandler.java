@@ -240,7 +240,7 @@ public class CommandHandler implements CommandExecutor {
             } else {
                 cs.sendMessage(ChatColor.RED + "Insufficient permissions.");
             }
-        } else if (label.equalsIgnoreCase("history")) {
+        } else if (label.equalsIgnoreCase("lookup")) {
             if (cs.hasPermission("punishments.history")) {
                 if (args.length == 1) {
                     String name = args[0];
@@ -265,7 +265,7 @@ public class CommandHandler implements CommandExecutor {
                         );
                     }
                 } else {
-                    cs.sendMessage(ChatColor.RED + "Usage: /history <player>");
+                    cs.sendMessage(ChatColor.RED + "Usage: /lookup <player>");
                 }
             } else {
                 cs.sendMessage(ChatColor.RED + "Insufficient permissions.");

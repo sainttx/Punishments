@@ -14,5 +14,5 @@ commands:
     description: unban
   unmute:
     description: unmute
-  history:
-    description: history
+  lookup:
+    description: lookup
